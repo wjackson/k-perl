@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 use t::QServer;
 
 use ok 'K::Raw';
@@ -8,42 +9,99 @@ use ok 'K::Raw';
 test_qserver {
     my $port = shift;
 
-    my $conn =  K::Raw::khpu("localhost", $port, "");
+    my $handle = khpu("localhost", $port, "");
     
-    ok $conn > 0, 'connected';
+    ok $handle > 0, 'connected';
 
-    ok  K::Raw::k($conn, '2 = 2'),              'parse true';
-    ok !K::Raw::k($conn, '2 = 3'),              'parse false';
-    is  K::Raw::k($conn, '`int$7'),      7,     'parse int';
-    is  K::Raw::k($conn, '"c"'),         'c',   'parse char';
-    is  K::Raw::k($conn, '`short$12'),   12,    'parse short';
-    is  K::Raw::k($conn, '`long$13'),    13,    'parse long';
+    scalar_tests($handle);
 
-    my $real = K::Raw::k($conn, '`real$13.7');
+    vector_tests($handle);
+
+    mixed_list_tests($handle);
+
+    kclose($handle);
+};
+
+sub scalar_tests {
+    my ($handle) = @_;
+
+    ok  k($handle, '2 = 2'), 'parse true';
+    ok !k($handle, '2 = 3'), 'parse false';
+
+    is k($handle, '`int$7'),    7,   'parse int';
+    is k($handle, '"c"'),       'c', 'parse char';
+    is k($handle, '`short$12'), 12,  'parse short';
+    is k($handle, '`long$13'),  13,  'parse long';
+
+    my $real = k($handle, '`real$13.7');
     ok $real > 13.699999, 'real lower bound';
     ok $real < 13.700001, 'real upper bound';
 
-    is K::Raw::k($conn, '`float$13.7'), 13.7,  'parse float';
-    is K::Raw::k($conn, '`foo'),        'foo', 'parse symbol';
+    is k($handle, '`float$13.7'), 13.7,  'parse float';
+    is k($handle, '`foo'),        'foo', 'parse symbol';
 
-    is K::Raw::k($conn, '2012.03.24D23:25:13.123'),
+    is k($handle, '2012.03.24D23:25:13.123'),
        '385946713123000000', 'parse timestamp';
 
-    is K::Raw::k($conn, '385946713123000000j'),
+    is k($handle, '385946713123000000j'),
        '385946713123000000', 'parse long';
 
-    is K::Raw::k($conn, '`month$3'),   3,    'parse month';
-    is K::Raw::k($conn, '2012.03.24'), 4466, 'parse date';
+    is k($handle, '`month$3'),   3,    'parse month';
+    is k($handle, '2012.03.24'), 4466, 'parse date';
     
-    is K::Raw::k($conn, '17D12:13:14.000001234'),
+    is k($handle, '17D12:13:14.000001234'),
        '1512794000001234', 'parse timespan';
 
-    is K::Raw::k($conn, '`minute$4'),   4,        'parse minute';
-    is K::Raw::k($conn, '`second$5'),   5,        'parse second';
-    is K::Raw::k($conn, '12:13:14.15'), 43994150, 'parse time';
+    is k($handle, '`minute$4'),   4,        'parse minute';
+    is k($handle, '`second$5'),   5,        'parse second';
+    is k($handle, '12:13:14.15'), 43994150, 'parse time';
 
-    my $datetime = K::Raw::k($conn, '2012.03.24T12:13:14.01');
+    my $datetime = k($handle, '2012.03.24T12:13:14.01');
     is sprintf('%.3f', $datetime), '4466.509', 'parse datetime';
-};
+
+    throws_ok { k($handle, 'does_not_exist') } qr/^does_not_exist at/,
+        'croaked properly on error';
+
+    # XXX: test nulls
+}
+
+sub vector_tests {
+    my ($handle) = @_;
+
+    is_deeply k($handle, '(0b;1b;0b)'), [0, 1, 0],   'parse bool vector';
+
+    # XXX: maybe convert to strings instead
+    is_deeply k($handle, '"abc"'), 'abc',      'parse char vector';
+
+    is_deeply k($handle, '(7h;8h;9h)'), [7, 8, 9],   'parse short vector';
+
+    is_deeply k($handle, '(7i;8i;9i)'), [7, 8, 9],   'parse int vector';
+
+    is_deeply k($handle, '(7j;8j;9j)'), [qw(7 8 9)], 'parse long vector';
+
+    is_deeply k($handle, '(7e;8e;9e)'), [7, 8, 9],   'parse real vector';
+
+    is_deeply k($handle, '(7f;8f;9f)'), [7, 8, 9],   'parse float vector';
+
+    is_deeply k($handle, '(`a;`b;`c)'), [qw(a b c)], 'parse symbol vector';
+}
+
+sub mixed_list_tests {
+    my ($handle) = @_;
+
+    is_deeply k($handle, '(1b;8i;9j)'), [1, 8, 9], 'parse mixed list of nums';
+
+    is_deeply
+        k($handle, '((1e;2i;(3f;4j));"x")'),
+        [
+            [
+                1,
+                2,
+                [3,4],
+            ],
+            'x',
+        ],
+        'parse complex mixed list';
+}
 
 done_testing;

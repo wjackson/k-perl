@@ -4,7 +4,7 @@ use inc::Module::Install;
 use ExtUtils::Depends;
 
 mkdir 'build';
-my $pkg = ExtUtils::Depends->new( 'K::Raw', 'XS::Object::Magic' );
+my $pkg = ExtUtils::Depends->new('K::Raw');
 
 my $q_home    = '/home/wjackson/q';
 my $q_include = "$q_home/include";
@@ -29,6 +29,7 @@ $pkg->save_config('build/IFiles.pm');
 
 makemaker_args(
     $pkg->get_makefile_vars,
+    OBJECT => '$(O_FILES)', # link all the C files too
 );
 
 name 'K';
@@ -36,7 +37,6 @@ license 'Perl_5';
 perl_version '5.010';
 all_from 'lib/K/Raw.pm';
 ppport;
-
 
 configure_requires 'ExtUtils::Depends';
 configure_requires 'XS::Object::Magic' => '0.04';
