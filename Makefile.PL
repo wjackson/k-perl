@@ -21,7 +21,8 @@ $pkg->set_inc("-I$q_include");
 $pkg->set_libs("-L$q_lib -lk");
 $pkg->add_xs('K.xs');
 $pkg->add_pm(
-    './lib/K/Raw.pm' => '$(INST_LIBDIR)/Raw.pm',
+    './lib/K/Raw.pm' => '$(INST_LIBDIR)/K/Raw.pm',
+    './lib/K.pm'     => '$(INST_LIBDIR)/K.pm',
 );
 $pkg->add_typemaps('typemap');
 $pkg->save_config('build/IFiles.pm');
@@ -30,7 +31,7 @@ makemaker_args(
     $pkg->get_makefile_vars,
 );
 
-name 'K-Raw';
+name 'K';
 license 'Perl_5';
 perl_version '5.010';
 all_from 'lib/K/Raw.pm';

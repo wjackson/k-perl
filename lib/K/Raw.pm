@@ -2,11 +2,10 @@ package K::Raw;
 use strict;
 use warnings;
 use XSLoader;
-use XS::Object::Magic;
 
 our $VERSION = '0.01';
 
-XSLoader::load('K::Raw', $VERSION);
+XSLoader::load('K', $VERSION);
 
 1;
 

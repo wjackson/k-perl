@@ -2,8 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
-use ok 'K::Raw';
+use ok 'K';
 
-K::Raw::hi();
+my $k = new_ok 'K';
 
 done_testing;
