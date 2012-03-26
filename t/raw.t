@@ -17,7 +17,11 @@ test_qserver {
 
     null_scalar_tests($handle);
 
+    infinity_scalar_tests($handle);
+
     null_vector_tests($handle);
+
+    infinite_vector_tests($handle);
 
     vector_tests($handle);
 
@@ -86,9 +90,32 @@ sub null_scalar_tests {
     is k( $handle, '0Nm' ),  undef, 'null month';
     is k( $handle, '0Nd' ),  undef, 'null day';
     is k( $handle, '0Nz' ),  undef, 'null datetime';
+    is k( $handle, '0Np' ),  undef, 'null timestamp';
     is k( $handle, '0Nu' ),  undef, 'null minute';
     is k( $handle, '0Nv' ),  undef, 'null second';
     is k( $handle, '0Nt' ),  undef, 'null time';
+
+    is k( $handle, '0n' ),   undef, 'NaN';
+}
+
+sub infinity_scalar_tests {
+    my ($handle) = @_;
+
+    is k( $handle, '0Wh'  ),  'inf', '+infinite short';
+    is k( $handle, '0W'   ),  'inf', '+infinite int';
+    is k( $handle, '0Wj'  ),  'inf', '+infinite long';
+    is k( $handle, '0We'  ),  'inf', '+infinite real';
+    is k( $handle, '0w'   ),  'inf', '+infinite float';
+    is k( $handle, '0Wz'  ),  'inf', '+infinite datetime';
+    is k( $handle, '0Wp'  ),  'inf', '+infinite timestamp';
+
+    is k( $handle, '-0Wh' ), '-inf', '-infinite short';
+    is k( $handle, '-0W'  ), '-inf', '-infinite int';
+    is k( $handle, '-0Wj' ), '-inf', '-infinite long';
+    is k( $handle, '-0We' ), '-inf', '-infinite real';
+    is k( $handle, '-0w'  ), '-inf', '-infinite float';
+    is k( $handle, '-0Wz' ), '-inf', '-infinite datetime';
+    is k( $handle, '-0Wp' ), '-inf', '-infinite timestamp';
 }
 
 sub null_vector_tests {
@@ -106,9 +133,32 @@ sub null_vector_tests {
     is_deeply k( $handle, '(),0Nm' ), [ undef ], 'null month vector';
     is_deeply k( $handle, '(),0Nd' ), [ undef ], 'null day vector';
     is_deeply k( $handle, '(),0Nz' ), [ undef ], 'null datetime vector';
+    is_deeply k( $handle, '(),0Np' ), [ undef ], 'null timestamp vector';
     is_deeply k( $handle, '(),0Nu' ), [ undef ], 'null minute vector';
     is_deeply k( $handle, '(),0Nv' ), [ undef ], 'null second vector';
     is_deeply k( $handle, '(),0Nt' ), [ undef ], 'null time vector';
+
+    is_deeply k( $handle, '(),0n'  ), [ undef ], 'NaN vector';
+}
+
+sub infinite_vector_tests {
+    my ($handle) = @_;
+
+    is_deeply k( $handle, '(),0Wh' ),  [ 'inf'  ], '+infinite short vector';
+    is_deeply k( $handle, '(),0W'  ),  [ 'inf'  ], '+infinite int vector';
+    is_deeply k( $handle, '(),0Wj' ),  [ 'inf'  ], '+infinite long vector';
+    is_deeply k( $handle, '(),0We' ),  [ 'inf'  ], '+infinite real vector';
+    is_deeply k( $handle, '(),0w'  ),  [ 'inf'  ], '+infinite float vector';
+    is_deeply k( $handle, '(),0Wz' ),  [ 'inf'  ], '+infinite datetime vector';
+    is_deeply k( $handle, '(),0Wp' ),  [ 'inf'  ], '+infinite timestamp vector';
+
+    is_deeply k( $handle, '(),-0Wh' ), [ '-inf' ], '-infinite short vector';
+    is_deeply k( $handle, '(),-0W'  ), [ '-inf' ], '-infinite int vector';
+    is_deeply k( $handle, '(),-0Wj' ), [ '-inf' ], '-infinite long vector';
+    is_deeply k( $handle, '(),-0We' ), [ '-inf' ], '-infinite real vector';
+    is_deeply k( $handle, '(),-0w'  ), [ '-inf' ], '-infinite float vector';
+    is_deeply k( $handle, '(),-0Wz' ), [ '-inf' ], '-infinite datetime vector';
+    is_deeply k( $handle, '(),-0Wp' ), [ '-inf' ], '-infinite timestamp vector';
 }
 
 sub vector_tests {

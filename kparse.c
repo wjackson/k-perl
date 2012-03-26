@@ -236,6 +236,14 @@ SV* short_from_k(K k) {
         return &PL_sv_undef;
     }
 
+    if (k->h == wh) {
+        return newSVpv("inf", 3);
+    }
+
+    if (k->h == -wh) {
+        return newSVpv("-inf", 4);
+    }
+
     return newSViv(k->h);
 }
 
@@ -244,12 +252,28 @@ SV* int_from_k(K k) {
         return &PL_sv_undef;
     }
 
+    if (k->i == wi) {
+        return newSVpv("inf", 3);
+    }
+
+    if (k->i == -wi) {
+        return newSVpv("-inf", 4);
+    }
+
     return newSViv(k->i);
 }
 
 SV* long_from_k(K k) {
     if (k->j == nj) {
         return &PL_sv_undef;
+    }
+
+    if (k->j == wj) {
+        return newSVpv("inf", 3);
+    }
+
+    if (k->j == -wj) {
+        return newSVpv("-inf", 4);
     }
 
     char buffer[33];
@@ -329,6 +353,16 @@ SV* short_vector_from_k(K k) {
             continue;
         }
 
+        if (kH(k)[i] == wh) {
+            av_push(av, newSVpv("inf", 3));
+            continue;
+        }
+
+        if (kH(k)[i] == -wh) {
+            av_push(av, newSVpv("-inf", 4));
+            continue;
+        }
+
         av_push(av, newSViv( kH(k)[i]) );
     }
 
@@ -342,6 +376,16 @@ SV* int_vector_from_k(K k) {
     for (i = 0; i < k->n; i++) {
         if (kI(k)[i] == ni) {
             av_push(av, &PL_sv_undef);
+            continue;
+        }
+
+        if (kI(k)[i] == wi) {
+            av_push(av, newSVpv("inf", 3));
+            continue;
+        }
+
+        if (kI(k)[i] == -wi) {
+            av_push(av, newSVpv("-inf", 4));
             continue;
         }
 
@@ -360,6 +404,16 @@ SV* long_vector_from_k(K k) {
     for (i = 0; i < k->n; i++) {
         if (kJ(k)[i] == nj) {
             av_push(av, &PL_sv_undef);
+            continue;
+        }
+
+        if (kJ(k)[i] == wj) {
+            av_push(av, newSVpv("inf", 3));
+            continue;
+        }
+
+        if (kJ(k)[i] == -wj) {
+            av_push(av, newSVpv("-inf", 4));
             continue;
         }
 
