@@ -112,7 +112,7 @@ sub dict_test {
 
     # dictionary
     is_deeply
-        k($handle, '`foo`bar!1,2'),
+        k($handle, '`foo`bar!(1;2)'),
         {
             foo => 1,
             bar => 2,
@@ -137,7 +137,7 @@ sub dict_test {
 sub table_test {
     my ($handle) = @_;
 
-    # table w/ primary key
+    # table
     is_deeply
         k($handle, '([] grr: (`aaa;`bbb;`ccc); bla: (`xxx;`yyy;`zzz))'),
         {

@@ -22,7 +22,9 @@ K::Raw - Perl bindings for K
 
 =head1 DESCRIPTION
 
-K bindings
+C<K> wraps the C library defined by
+L<k.h|http://code.kx.com/wsvn/code/kx/kdb%2B/c/c/k.h>  and described here
+L<http://code.kx.com/wiki/Cookbook/InterfacingWithC> .
 
 =head1 AUTHORS
 
