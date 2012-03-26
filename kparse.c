@@ -3,6 +3,11 @@
  */
 #include "k.h"
 #include "kparse.h"
+#include <math.h>
+#include <string.h>
+
+#define NULL_SHORT kh(nh
+#define NULL_SYM   ks("")->s
 
 SV* sv_from_k(K k) {
     if (k->t < 0) {
@@ -209,38 +214,70 @@ SV* mixed_list_from_k(K k) {
  */
 
 SV* bool_from_k(K k) {
+    if (k->g == 0) {
+        return &PL_sv_undef;
+    }
+
     return newSViv( k->g );
 }
 
 SV* char_from_k(K k) {
+    if (k->g == 0) {
+        return &PL_sv_undef;
+    }
+
     char byte_str[1];
     byte_str[0] = k->g;
     return newSVpvn(byte_str, 1);
 }
 
 SV* short_from_k(K k) {
+    if (k->h == nh) {
+        return &PL_sv_undef;
+    }
+
     return newSViv(k->h);
 }
 
 SV* int_from_k(K k) {
+    if (k->i == ni) {
+        return &PL_sv_undef;
+    }
+
     return newSViv(k->i);
 }
 
 SV* long_from_k(K k) {
+    if (k->j == nj) {
+        return &PL_sv_undef;
+    }
+
     char buffer[33];
     snprintf(buffer, 33, "%Ld", k->j);
     return newSVpv(buffer, 0);
 }
 
 SV* real_from_k(K k) {
+    if (isnan(k->e)) {
+        return &PL_sv_undef;
+    }
+
     return newSVnv(k->e);
 }
 
 SV* float_from_k(K k) {
+    if (isnan(k->f)) {
+        return &PL_sv_undef;
+    }
+
     return newSVnv(k->f);
 }
 
 SV* symbol_from_k(K k) {
+    if (strncmp(k->s, NULL_SYM, k->n) == 0) {
+        return &PL_sv_undef;
+    }
+
     return newSVpv(k->s, 0);
 }
 
@@ -253,6 +290,11 @@ SV* bool_vector_from_k(K k) {
     int i = 0;
 
     for (i = 0; i < k->n; i++) {
+        if (kG(k)[i] == 0) {
+            av_push(av, &PL_sv_undef);
+            continue;
+        }
+
         av_push(av, newSViv( kG(k)[i]) );
     }
 
@@ -265,6 +307,11 @@ SV* byte_vector_from_k(K k) {
     int i = 0;
 
     for (i = 0; i < k->n; i++) {
+        if (kG(k)[i] == 0) {
+            av_push(av, &PL_sv_undef);
+            continue;
+        }
+
         byte_str[0] = kG(k)[i];
         av_push(av, newSVpvn(byte_str, 1));
     }
@@ -272,22 +319,16 @@ SV* byte_vector_from_k(K k) {
     return (SV*)av;
 }
 
-/* SV* char_vector_from_k(K k) { */
-/*     int i = 0; */
-/*     char str[k->n]; */
-/*  */
-/*     for (i = 0; i < k->n; i++) { */
-/*         str[i] = kG(k)[i]; */
-/*     } */
-/*  */
-/*     return newSVpvn(str, k->n); */
-/* } */
-
 SV* short_vector_from_k(K k) {
     AV *av = newAV();
     int i = 0;
 
     for (i = 0; i < k->n; i++) {
+        if (kH(k)[i] == nh) {
+            av_push(av, &PL_sv_undef);
+            continue;
+        }
+
         av_push(av, newSViv( kH(k)[i]) );
     }
 
@@ -299,6 +340,11 @@ SV* int_vector_from_k(K k) {
     int i = 0;
 
     for (i = 0; i < k->n; i++) {
+        if (kI(k)[i] == ni) {
+            av_push(av, &PL_sv_undef);
+            continue;
+        }
+
         av_push(av, newSViv( kI(k)[i]) );
     }
 
@@ -312,6 +358,11 @@ SV* long_vector_from_k(K k) {
     int i = 0;
 
     for (i = 0; i < k->n; i++) {
+        if (kJ(k)[i] == nj) {
+            av_push(av, &PL_sv_undef);
+            continue;
+        }
+
         snprintf(buffer, 33, "%Ld", kJ(k)[i]);
         av_push(av, newSVpv(buffer, 0) );
     }
@@ -324,6 +375,11 @@ SV* real_vector_from_k(K k) {
     int i = 0;
 
     for (i = 0; i < k->n; i++) {
+        if (isnan( kE(k)[i] )) {
+            av_push(av, &PL_sv_undef);
+            continue;
+        }
+
         av_push(av, newSVnv( kE(k)[i] ) );
     }
 
@@ -335,6 +391,11 @@ SV* float_vector_from_k(K k) {
     int i = 0;
 
     for (i = 0; i < k->n; i++) {
+        if (isnan( kF(k)[i] )) {
+            av_push(av, &PL_sv_undef);
+            continue;
+        }
+
         av_push(av, newSVnv( kF(k)[i] ) );
     }
 
@@ -344,8 +405,16 @@ SV* float_vector_from_k(K k) {
 SV* symbol_vector_from_k(K k) {
     AV *av = newAV();
     int i = 0;
+    char *sym = NULL;
 
     for (i = 0; i < k->n; i++) {
+        sym = kS(k)[i];
+
+        if (strncmp(sym, NULL_SYM, strlen(sym)) == 0) {
+            av_push(av, &PL_sv_undef);
+            continue;
+        }
+
         av_push(av, newSVpv( kS(k)[i], 0 ) );
     }
 

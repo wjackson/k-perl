@@ -24,9 +24,11 @@ if (!defined $c_o || !-f $c_o) {
 checklibs(
     incpath => './q',
     header  => 'k.h',
+    lib     => 'pthread', # not always needed
 );
 
 $pkg->set_inc("-Iq");
+$pkg->set_libs("-lpthread"); # not always needed
 $pkg->add_xs('K.xs');
 $pkg->add_pm(
     './lib/K/Raw.pm' => '$(INST_LIBDIR)/K/Raw.pm',

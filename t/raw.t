@@ -10,10 +10,14 @@ test_qserver {
     my $port = shift;
 
     my $handle = khpu("localhost", $port, "");
-    
+
     ok $handle > 0, 'connected';
 
     scalar_tests($handle);
+
+    null_scalar_tests($handle);
+
+    null_vector_tests($handle);
 
     vector_tests($handle);
 
@@ -52,7 +56,7 @@ sub scalar_tests {
 
     is k($handle, '`month$3'),   3,    'parse month';
     is k($handle, '2012.03.24'), 4466, 'parse date';
-    
+
     is k($handle, '17D12:13:14.000001234'),
        '1512794000001234', 'parse timespan';
 
@@ -65,28 +69,66 @@ sub scalar_tests {
 
     throws_ok { k($handle, 'does_not_exist') } qr/^does_not_exist at/,
         'croaked properly on error';
+}
 
-    # XXX: test nulls
+sub null_scalar_tests {
+    my ($handle) = @_;
+
+    is k( $handle, '0b' ),   undef, 'null boolean';
+    is k( $handle, '0x00' ), undef, 'null byte';
+    is k( $handle, '0Nh' ),  undef, 'null short';
+    is k( $handle, '0N' ),   undef, 'null int';
+    is k( $handle, '0Nj' ),  undef, 'null long';
+    is k( $handle, '0Ne' ),  undef, 'null real';
+    is k( $handle, '0n' ),   undef, 'null float';
+    is k( $handle, '" "' ),  ' ',   'null char'; # this ones weird
+    is k( $handle, '`' ),    undef, 'null sym';
+    is k( $handle, '0Nm' ),  undef, 'null month';
+    is k( $handle, '0Nd' ),  undef, 'null day';
+    is k( $handle, '0Nz' ),  undef, 'null datetime';
+    is k( $handle, '0Nu' ),  undef, 'null minute';
+    is k( $handle, '0Nv' ),  undef, 'null second';
+    is k( $handle, '0Nt' ),  undef, 'null time';
+}
+
+sub null_vector_tests {
+    my ($handle) = @_;
+
+    is_deeply k( $handle, '(),0b'  ), [ undef ], 'null boolean vector';
+    is_deeply k( $handle, '(),0x00'), [ undef ], 'null byte vector';
+    is_deeply k( $handle, '(),0Nh' ), [ undef ], 'null short vector';
+    is_deeply k( $handle, '(),0N'  ), [ undef ], 'null int vector';
+    is_deeply k( $handle, '(),0Nj' ), [ undef ], 'null long vector';
+    is_deeply k( $handle, '(),0Ne' ), [ undef ], 'null real vector';
+    is_deeply k( $handle, '(),0n'  ), [ undef ], 'null float vector';
+    is_deeply k( $handle, '()," "' ), [ ' '   ], 'null char vector'; # this ones weird
+    is_deeply k( $handle, '(),`'   ), [ undef ], 'null sym vector';
+    is_deeply k( $handle, '(),0Nm' ), [ undef ], 'null month vector';
+    is_deeply k( $handle, '(),0Nd' ), [ undef ], 'null day vector';
+    is_deeply k( $handle, '(),0Nz' ), [ undef ], 'null datetime vector';
+    is_deeply k( $handle, '(),0Nu' ), [ undef ], 'null minute vector';
+    is_deeply k( $handle, '(),0Nv' ), [ undef ], 'null second vector';
+    is_deeply k( $handle, '(),0Nt' ), [ undef ], 'null time vector';
 }
 
 sub vector_tests {
     my ($handle) = @_;
 
-    is_deeply k($handle, '(0b;1b;0b)'), [0, 1, 0],   'parse bool vector';
+    is_deeply k($handle, '(0b;1b;0b)'), [undef, 1, undef], 'parse bool vector';
 
-    is_deeply k($handle, '"abc"'),      [qw(a b c)], 'parse char vector';
+    is_deeply k($handle, '"abc"'),      [qw(a b c)],       'parse char vector';
 
-    is_deeply k($handle, '(7h;8h;9h)'), [7, 8, 9],   'parse short vector';
+    is_deeply k($handle, '(7h;8h;9h)'), [7, 8, 9],         'parse short vector';
 
-    is_deeply k($handle, '(7i;8i;9i)'), [7, 8, 9],   'parse int vector';
+    is_deeply k($handle, '(7i;8i;9i)'), [7, 8, 9],         'parse int vector';
 
-    is_deeply k($handle, '(7j;8j;9j)'), [qw(7 8 9)], 'parse long vector';
+    is_deeply k($handle, '(7j;8j;9j)'), [qw(7 8 9)],       'parse long vector';
 
-    is_deeply k($handle, '(7e;8e;9e)'), [7, 8, 9],   'parse real vector';
+    is_deeply k($handle, '(7e;8e;9e)'), [7, 8, 9],         'parse real vector';
 
-    is_deeply k($handle, '(7f;8f;9f)'), [7, 8, 9],   'parse float vector';
+    is_deeply k($handle, '(7f;8f;9f)'), [7, 8, 9],         'parse float vector';
 
-    is_deeply k($handle, '(`a;`b;`c)'), [qw(a b c)], 'parse symbol vector';
+    is_deeply k($handle, '(`a;`b;`c)'), [qw(a b c)],       'parse symbol vector';
 }
 
 sub mixed_list_tests {
