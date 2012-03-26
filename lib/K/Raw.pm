@@ -4,7 +4,7 @@ use warnings;
 use XSLoader;
 use Exporter;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(khpu khpun k kclose);
 
