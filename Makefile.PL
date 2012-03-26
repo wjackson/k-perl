@@ -48,6 +48,7 @@ ppport;
 
 configure_requires 'ExtUtils::Depends';
 requires 'Sub::Exporter';
+requires 'Moose';
 requires 'namespace::autoclean';
 test_requires 'File::Which';
 test_requires 'Test::More';
