@@ -6,19 +6,26 @@ use ExtUtils::Depends;
 mkdir 'build';
 my $pkg = ExtUtils::Depends->new('K::Raw');
 
-my $q_home    = '/home/wjackson/q';
-my $q_include = "$q_home/include";
-my $q_lib     = "$q_home/lib";
+my $c_o = defined $ENV{QOBJ} ? $ENV{QOBJ}
+        : -f 'q/c.o'         ? 'q/c.o'
+        :                      undef
+        ;
+
+if (!defined $c_o && !-f $c_o) {
+    die q{*** Unable to find the required file c.o which is distributed by }
+      . q{kx.com.  Set the environment variable QOBJ to the location of c.o }
+      . q{or download the appropriate file and place it into the q }
+      . q{directory. Find the correct file for you system here: }
+      . q{http://kx.com/q. For example the url for the 32 bit linux file is }
+      . q{http://kx.com/q/l32/c.o .}
+      ;
+}
 
 checklibs(
-    libpath => $q_lib,
-    incpath => $q_include,
-    lib     => 'k',
     header  => 'k.h',
 );
 
-$pkg->set_inc("-I$q_include");
-$pkg->set_libs("-L$q_lib -lk");
+$pkg->set_inc("-Iq");
 $pkg->add_xs('K.xs');
 $pkg->add_pm(
     './lib/K/Raw.pm' => '$(INST_LIBDIR)/K/Raw.pm',
@@ -29,7 +36,7 @@ $pkg->save_config('build/IFiles.pm');
 
 makemaker_args(
     $pkg->get_makefile_vars,
-    OBJECT => '$(O_FILES)', # link all the C files too
+    OBJECT => "\$(O_FILES) $c_o", # link all the C files too
 );
 
 name 'K';
