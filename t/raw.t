@@ -19,6 +19,10 @@ test_qserver {
 
     mixed_list_tests($handle);
 
+    dict_test($handle);
+
+    table_test($handle);
+
     kclose($handle);
 };
 
@@ -70,8 +74,7 @@ sub vector_tests {
 
     is_deeply k($handle, '(0b;1b;0b)'), [0, 1, 0],   'parse bool vector';
 
-    # XXX: maybe convert to strings instead
-    is_deeply k($handle, '"abc"'), 'abc',      'parse char vector';
+    is_deeply k($handle, '"abc"'),      [qw(a b c)], 'parse char vector';
 
     is_deeply k($handle, '(7h;8h;9h)'), [7, 8, 9],   'parse short vector';
 
@@ -102,6 +105,68 @@ sub mixed_list_tests {
             'x',
         ],
         'parse complex mixed list';
+}
+
+sub dict_test {
+    my ($handle) = @_;
+
+    # dictionary
+    is_deeply
+        k($handle, '`foo`bar!1,2'),
+        {
+            foo => 1,
+            bar => 2,
+        },
+        'parse dictionary';
+
+    # one key dictionary
+    is_deeply
+        k($handle, '`foo!1'),
+        1,
+        'parse dictionary with one val';
+
+    is_deeply
+        k($handle, '`foo`bar!((1;2);(3;4))'),
+        {
+            foo => [ 1, 2],
+            bar => [ 3, 4 ],
+        },
+        'parse dictionary w/ list values';
+}
+
+sub table_test {
+    my ($handle) = @_;
+
+    # table w/ primary key
+    is_deeply
+        k($handle, '([] grr: (`aaa;`bbb;`ccc); bla: (`xxx;`yyy;`zzz))'),
+        {
+            grr => [qw(aaa bbb ccc)],
+            bla => [qw(xxx yyy zzz)],
+        },
+        'parse table';
+
+    is_deeply
+        k($handle, '([] hah: `symbol$(`aaa;`bbb;`ccc))'),
+        {
+            hah => [qw(aaa bbb ccc)],
+        },
+        'parse single column table';
+
+    # table w/ primary key
+    is_deeply
+        k($handle, '([p: (`a;`b); q: (`c;`d) ] foo: (`aaa;`bbb); bar: (`ccc;`ddd))'),
+        [
+            {
+                p => [qw(a b)],
+                q => [qw(c d)],
+            },
+            {
+                foo => [qw(aaa bbb)],
+                bar => [qw(ccc ddd)],
+            }
+        ],
+        'parse table w/ primary key';
 }
 
 done_testing;

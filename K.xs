@@ -45,6 +45,6 @@ k_k(handle, kcmd)
     char *kcmd
     CODE:
         K resp = k(handle, kcmd, (K)0);
-        RETVAL = k_to_sv_ptr(resp);
+        RETVAL = sv_from_k(resp);
     OUTPUT:
         RETVAL

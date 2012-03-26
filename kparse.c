@@ -4,7 +4,7 @@
 #include "k.h"
 #include "kparse.h"
 
-SV* k_to_sv_ptr(K k) {
+SV* sv_from_k(K k) {
     if (k->t < 0) {
         return scalar_from_k(k);
     }
@@ -84,12 +84,8 @@ SV* vector_from_k(K k) {
             break;
 
         case KG: // byte
-            result = byte_vector_from_k(k);
-            break;
-
-        // special case: char vectors become scalar strings
         case KC: // char
-            return char_vector_from_k(k);
+            result = byte_vector_from_k(k);
             break;
 
         case KH: // short
@@ -124,12 +120,77 @@ SV* vector_from_k(K k) {
             result = symbol_vector_from_k(k);
             break;
 
+        case XT: // table or flip
+            result = table_from_k(k);
+            break;
+
+        case XD: // dict or table w/ primary keys
+            result = xd_from_k(k);
+            break;
+
         default:
             croak("unrecognized vector type '%d'\n", k->t);
             break;
     }
 
-    return newRV_noinc((SV* )result);
+    return newRV_noinc((SV*)result);
+}
+
+/*
+ * K structs of type XD are either a partitioned table or a dictionary.
+ * Dispath accordingly.
+ */
+SV* xd_from_k(K k) {
+    if (kK(k)[0]->t == XT && kK(k)[1]->t == XT) {
+        return ptable_from_k(k);
+    }
+    else if (kK(k)[0]->t == KS) {
+        return dict_from_k(k);
+    }
+    else {
+        croak("Unrecognized XD (dictionary) form");
+    }
+}
+
+SV* ptable_from_k(K k) {
+    AV* av = newAV();
+    K t0   = kK(k)[0]; // partitioned tables have 2 sub-tables
+    K t1   = kK(k)[1];
+
+    av_push(av, newRV_noinc( table_from_k(t0) ) );
+    av_push(av, newRV_noinc( table_from_k(t1) ) );
+
+    return (SV*) av;
+}
+
+SV* dict_from_k(K k) {
+    int i;
+    SV **key;
+    SV **val;
+    HV *hv = newHV();
+    HE *store_ret;
+
+    AV* keys   = (AV*) SvRV( sv_from_k( kK(k)[0] ) );
+    AV* values = (AV*) SvRV( sv_from_k( kK(k)[1] ) );
+
+    int key_count = av_len(keys) + 1;
+
+    for (i = 0; i < key_count; i++) {
+        key = av_fetch(keys, i, 0);
+        val = av_fetch(values, i, 0);
+
+        store_ret = hv_store_ent(hv, *key, *val, 0);
+        if (store_ret == NULL) {
+            croak("Failed to convert k hash entry to perl hash entry");
+        }
+    }
+
+    return (SV*)hv;
+}
+
+SV* table_from_k(K k) {
+    K dict = k->k;
+    return dict_from_k(dict);
 }
 
 SV* mixed_list_from_k(K k) {
@@ -137,7 +198,7 @@ SV* mixed_list_from_k(K k) {
     int i = 0;
 
     for (i = 0; i < k->n; i++) {
-        av_push(av, k_to_sv_ptr( kK(k)[i] ) );
+        av_push(av, sv_from_k( kK(k)[i] ) );
     }
 
     return newRV_noinc((SV* )av);
@@ -145,7 +206,6 @@ SV* mixed_list_from_k(K k) {
 
 /*
  * scalar helpers
- *
  */
 
 SV* bool_from_k(K k) {
@@ -186,7 +246,6 @@ SV* symbol_from_k(K k) {
 
 /*
  * vector helpers
- *
  */
 
 SV* bool_vector_from_k(K k) {
@@ -213,16 +272,16 @@ SV* byte_vector_from_k(K k) {
     return (SV*)av;
 }
 
-SV* char_vector_from_k(K k) {
-    int i = 0;
-    char str[k->n];
-
-    for (i = 0; i < k->n; i++) {
-        str[i] = kG(k)[i];
-    }
-
-    return newSVpvn(str, k->n);
-}
+/* SV* char_vector_from_k(K k) { */
+/*     int i = 0; */
+/*     char str[k->n]; */
+/*  */
+/*     for (i = 0; i < k->n; i++) { */
+/*         str[i] = kG(k)[i]; */
+/*     } */
+/*  */
+/*     return newSVpvn(str, k->n); */
+/* } */
 
 SV* short_vector_from_k(K k) {
     AV *av = newAV();
