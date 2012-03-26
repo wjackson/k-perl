@@ -121,10 +121,10 @@ L<http://code.kx.com/wiki/Cookbook/InterfacingWithC> .
 C<K>'s OO interface is a thin layer of sugar on top of the L<K::Raw> which
 mimics the C library as faithfully as possible.
 
-For now, L<K> returns Perl very simple representations of k values.  For
+For now, L<K> returns very Perl simple representations of k values.  For
 example, internaly k timestamps are 64-bit ints where the value is the number
 of nanoseconds since 2001.01.01D00:00:00.000 .  L<K> returns the int value as
-string (ex: '385906394151617280').  This will likely change.
+a string (ex: '385906394151617280').  This will likely change.
 
 =head1 SEE ALSO
 

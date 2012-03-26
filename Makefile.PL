@@ -4,16 +4,16 @@ use inc::Module::Install;
 use ExtUtils::Depends;
 
 mkdir 'build';
-my $pkg = ExtUtils::Depends->new('K::Raw');
+my $pkg = ExtUtils::Depends->new('K');
 
-my $c_o = defined $ENV{QOBJ} ? $ENV{QOBJ}
+my $c_o = defined $ENV{KOBJ} ? $ENV{KOBJ}
         : -f 'q/c.o'         ? 'q/c.o'
         :                      undef
         ;
 
-if (!defined $c_o && !-f $c_o) {
+if (!defined $c_o || !-f $c_o) {
     die q{*** Unable to find the required file c.o which is distributed by }
-      . q{kx.com.  Set the environment variable QOBJ to the location of c.o }
+      . q{kx.com.  Set the environment variable KOBJ to the location of c.o }
       . q{or download the appropriate file and place it into the q }
       . q{directory. Find the correct file for you system here: }
       . q{http://kx.com/q. For example the url for the 32 bit linux file is }
@@ -22,6 +22,7 @@ if (!defined $c_o && !-f $c_o) {
 }
 
 checklibs(
+    incpath => './q',
     header  => 'k.h',
 );
 
