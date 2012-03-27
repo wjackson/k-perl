@@ -3,22 +3,21 @@
  */
 #include "k.h"
 #include "kparse.h"
-#include <math.h>
 #include <string.h>
 
-#define NULL_SHORT kh(nh
-#define NULL_SYM   ks("")->s
-
 SV* sv_from_k(K k) {
+    SV* result;
     if (k->t < 0) {
-        return scalar_from_k(k);
+        result = scalar_from_k(k);
     }
     else if (k->t > 0) {
-        return vector_from_k(k);
+        result = vector_from_k(k);
     }
     else {
-        return mixed_list_from_k(k);
+        result = mixed_list_from_k(k);
     }
+
+    return result;
 }
 
 SV* scalar_from_k(K k) {
@@ -175,20 +174,28 @@ SV* dict_from_k(K k) {
     HV *hv = newHV();
     HE *store_ret;
 
-    AV* keys   = (AV*) SvRV( sv_from_k( kK(k)[0] ) );
-    AV* values = (AV*) SvRV( sv_from_k( kK(k)[1] ) );
+    SV* keys_ref = sv_from_k( kK(k)[0] );
+    SV* vals_ref = sv_from_k( kK(k)[1] );
+
+    AV* keys = (AV*) SvRV( keys_ref );
+    AV* vals = (AV*) SvRV( vals_ref );
 
     int key_count = av_len(keys) + 1;
 
     for (i = 0; i < key_count; i++) {
         key = av_fetch(keys, i, 0);
-        val = av_fetch(values, i, 0);
+        val = av_fetch(vals, i, 0);
 
         store_ret = hv_store_ent(hv, *key, *val, 0);
         if (store_ret == NULL) {
             croak("Failed to convert k hash entry to perl hash entry");
         }
+
+        SvREFCNT_inc(*val);
     }
+
+    SvREFCNT_dec(keys_ref);
+    SvREFCNT_dec(vals_ref);
 
     return (SV*)hv;
 }
@@ -237,11 +244,11 @@ SV* short_from_k(K k) {
     }
 
     if (k->h == wh) {
-        return newSVpv("inf", 3);
+        return newSVpvn("inf", 3);
     }
 
     if (k->h == -wh) {
-        return newSVpv("-inf", 4);
+        return newSVpvn("-inf", 4);
     }
 
     return newSViv(k->h);
@@ -253,13 +260,14 @@ SV* int_from_k(K k) {
     }
 
     if (k->i == wi) {
-        return newSVpv("inf", 3);
+        return newSVpvn("inf", 3);
     }
 
     if (k->i == -wi) {
-        return newSVpv("-inf", 4);
+        return newSVpvn("-inf", 4);
     }
 
+    /* return SvREFCNT_inc(newSViv(k->i)); */
     return newSViv(k->i);
 }
 
@@ -269,11 +277,11 @@ SV* long_from_k(K k) {
     }
 
     if (k->j == wj) {
-        return newSVpv("inf", 3);
+        return newSVpvn("inf", 3);
     }
 
     if (k->j == -wj) {
-        return newSVpv("-inf", 4);
+        return newSVpvn("-inf", 4);
     }
 
     char buffer[33];
@@ -298,7 +306,7 @@ SV* float_from_k(K k) {
 }
 
 SV* symbol_from_k(K k) {
-    if (strncmp(k->s, NULL_SYM, k->n) == 0) {
+    if (strncmp(k->s, "", k->n) == 0) {
         return &PL_sv_undef;
     }
 
@@ -354,12 +362,12 @@ SV* short_vector_from_k(K k) {
         }
 
         if (kH(k)[i] == wh) {
-            av_push(av, newSVpv("inf", 3));
+            av_push(av, newSVpvn("inf", 3));
             continue;
         }
 
         if (kH(k)[i] == -wh) {
-            av_push(av, newSVpv("-inf", 4));
+            av_push(av, newSVpvn("-inf", 4));
             continue;
         }
 
@@ -380,12 +388,12 @@ SV* int_vector_from_k(K k) {
         }
 
         if (kI(k)[i] == wi) {
-            av_push(av, newSVpv("inf", 3));
+            av_push(av, newSVpvn("inf", 3));
             continue;
         }
 
         if (kI(k)[i] == -wi) {
-            av_push(av, newSVpv("-inf", 4));
+            av_push(av, newSVpvn("-inf", 4));
             continue;
         }
 
@@ -408,12 +416,12 @@ SV* long_vector_from_k(K k) {
         }
 
         if (kJ(k)[i] == wj) {
-            av_push(av, newSVpv("inf", 3));
+            av_push(av, newSVpvn("inf", 3));
             continue;
         }
 
         if (kJ(k)[i] == -wj) {
-            av_push(av, newSVpv("-inf", 4));
+            av_push(av, newSVpvn("-inf", 4));
             continue;
         }
 
@@ -464,7 +472,7 @@ SV* symbol_vector_from_k(K k) {
     for (i = 0; i < k->n; i++) {
         sym = kS(k)[i];
 
-        if (strncmp(sym, NULL_SYM, strlen(sym)) == 0) {
+        if (strncmp(sym, "", strlen(sym)) == 0) {
             av_push(av, &PL_sv_undef);
             continue;
         }
