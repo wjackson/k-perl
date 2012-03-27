@@ -116,6 +116,8 @@ K - Perl bindings for k (aka q, aka kdb, aka kx)
     #   },
     # ]
 
+    $k->async_cmd( q/.u.upd[`t; (`foo; 2012.03.27D13:14:15.161718; 1.23)]/ );
+
 =head1 DESCRIPTION
 
 Connect to a remote K or Q instance.  Execute commands.  Read replies.
