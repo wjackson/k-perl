@@ -56,6 +56,5 @@ test_requires 'File::Which';
 test_requires 'Test::More';
 test_requires 'Test::Exception';
 test_requires 'Test::TCP';
-test_requires 'ok';
 
 WriteAll;

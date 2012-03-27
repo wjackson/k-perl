@@ -15,6 +15,7 @@ sub test_qserver(&;$) {
     my $q = which 'q';
     unless ($q && -e $q && -x _) {
         plan skip_all => 'q not found in your PATH';
+        return;
     }
 
     test_tcp

@@ -4,10 +4,10 @@ use Test::More;
 use Test::Exception;
 use t::QServer;
 
-use ok 'K::Raw';
-
 test_qserver {
     my $port = shift;
+
+    use_ok 'K::Raw';
 
     my $handle = khpu("localhost", $port, "");
 
@@ -261,4 +261,4 @@ sub table_test {
         'parse table w/ primary key';
 }
 
-done_testing;
+END { done_testing; }

@@ -3,10 +3,10 @@ use warnings;
 use Test::More;
 use t::QServer;
 
-use ok 'K';
-
 test_qserver {
     my $port = shift;
+
+    use_ok 'K';
 
     my $k = K->new(port => $port);
 
@@ -19,4 +19,4 @@ test_qserver {
        'timestamp';
 };
 
-done_testing;
+END { done_testing; }
