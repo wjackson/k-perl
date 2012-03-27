@@ -132,6 +132,18 @@ SV* vector_from_k(K k) {
             result = xd_from_k(k);
             break;
 
+        case 100: // function
+            return &PL_sv_undef;
+            break;
+
+        case 101: // generic null
+            return &PL_sv_undef;
+            break;
+
+        case 102: // not sure actually. the q cmd '{:}[]' returns a 102h
+            return &PL_sv_undef;
+            break;
+
         default:
             croak("unrecognized vector type '%d'\n", k->t);
             break;
