@@ -57,6 +57,12 @@ sub cmd {
     return k($self->handle, $cmd);
 }
 
+sub async_cmd {
+    my ($self, $cmd) = @_;
+
+    return k(-$self->handle, $cmd);
+}
+
 sub DEMOLISH {
     my ($self) = @_;
 

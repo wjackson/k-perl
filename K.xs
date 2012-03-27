@@ -44,8 +44,21 @@ k_k(handle, kcmd)
     int handle
     char *kcmd
     CODE:
-        K resp = k(handle, kcmd, (K)0);
-        RETVAL = sv_from_k(resp);
-        r0(resp);
+        K resp;
+        if (handle > 0) {      // synchronous
+            resp = k(handle, kcmd, (K)0);
+            RETVAL = sv_from_k(resp);
+            r0(resp);
+        }
+        else if (handle < 0) { // asynchronous
+            resp = k(handle, kcmd, (K)0);
+            if (resp == NULL) {
+                croak("Failed to execute command asynchronously");
+            }
+            RETVAL = &PL_sv_undef;
+        }
+        else {
+            croak("Attempt to call k on an invalid handle");
+        }
     OUTPUT:
         RETVAL
