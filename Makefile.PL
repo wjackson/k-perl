@@ -46,7 +46,7 @@ name 'K';
 license 'Perl_5';
 perl_version '5.010';
 repository 'http://github.com/wjackson/k-perl';
-all_from 'lib/K/Raw.pm';
+all_from 'lib/K.pm';
 ppport;
 
 configure_requires 'ExtUtils::Depends';

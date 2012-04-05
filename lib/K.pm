@@ -1,4 +1,7 @@
 package K;
+BEGIN {
+    $K::VERSION = '0.05';
+}
 use Moose;
 use namespace::autoclean;
 use K::Raw;

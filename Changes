@@ -1,3 +1,6 @@
+0.05 Thu. Apr 05, 2012
+    - Make sure version and abstract are set properly
+
 0.04 Tue. Mar 27, 2012
     - Handle undocumented K struct types 100,102, and 103
 

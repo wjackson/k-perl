@@ -1,14 +1,16 @@
 package K::Raw;
+BEGIN {
+    $K::Raw::VERSION = '0.05';
+}
 use strict;
 use warnings;
 use XSLoader;
 use Exporter;
 
-our $VERSION = '0.04';
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(khpu khpun k kclose);
 
-XSLoader::load('K', $VERSION);
+XSLoader::load('K');
 
 1;
 
@@ -19,12 +21,6 @@ __END__
 =head1 NAME
 
 K::Raw - Low-level Perl bindings for k (aka q, aka kdb, aka kx)
-
-=head1 DESCRIPTION
-
-C<K::Raw> wraps the C library defined by
-L<k.h|http://code.kx.com/wsvn/code/kx/kdb%2B/c/c/k.h>  and described here
-L<http://code.kx.com/wiki/Cookbook/InterfacingWithC> .
 
 =head1 SYNOPSIS
 
@@ -41,6 +37,12 @@ L<http://code.kx.com/wiki/Cookbook/InterfacingWithC> .
     k($handle, q/2012.03.24D12:13:14.15161728/); # '385906394151617280'
 
     kclose($handle);
+
+=head1 DESCRIPTION
+
+C<K::Raw> wraps the C library defined by
+L<k.h|http://code.kx.com/wsvn/code/kx/kdb%2B/c/c/k.h>  and described here
+L<http://code.kx.com/wiki/Cookbook/InterfacingWithC> .
 
 =head1 SUBS
 
