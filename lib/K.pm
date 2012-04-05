@@ -116,6 +116,9 @@ K - Perl bindings for k (aka q, aka kdb, aka kx)
     #   },
     # ]
 
+    # asynchronous command
+    $k->async_cmd( q/([p: (`a;`b)] foo: (`b;`c); bar: (`d;`e))/ );
+
 =head1 DESCRIPTION
 
 Connect to a remote K or Q instance.  Execute commands.  Read replies.
