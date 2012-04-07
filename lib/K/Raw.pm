@@ -8,7 +8,7 @@ use XSLoader;
 use Exporter;
 
 our @ISA     = qw(Exporter);
-our @EXPORT  = qw(khpu khpun k kclose listen);
+our @EXPORT  = qw(khpu khpun k kclose);
 
 XSLoader::load('K');
 
@@ -35,6 +35,12 @@ K::Raw - Low-level Perl bindings for k (aka q, aka kdb, aka kx)
     k($handle, q/`foo`bar!(1;2)/); # { foo => 1, bar => 2 }
 
     k($handle, q/2012.03.24D12:13:14.15161728/); # '385906394151617280'
+
+    # execute cmd asynchrounously
+    k(-$handle, q/.u.upd[`t;(`foo;1.23)]/);
+
+    # read an incoming message
+    my $msg = k($handle);
 
     kclose($handle);
 

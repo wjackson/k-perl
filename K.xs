@@ -2,7 +2,6 @@
 #include "perl.h"
 #include "XSUB.h"
 #include <errno.h>
-#define NEED_sv_2pv_flags
 #include "ppport.h"
 #include "k.h"
 #include "kparse.h"
@@ -40,38 +39,42 @@ k_kclose(handle)
         kclose(handle);
 
 SV*
-k_k(handle, kcmd)
+k_k(handle, kcmd=&PL_sv_undef)
     int handle
-    char *kcmd
+    SV *kcmd
     CODE:
         K resp;
-        if (handle > 0) {      // synchronous
-            resp = k(handle, kcmd, (K)0);
+        char *kcmd_str;
+
+        if (handle == 0) {
+            croak("Attempt to call k on an invalid handle");
+        }
+
+        // send
+        if (SvOK(kcmd)) {
+            kcmd_str = SvPV_nolen(kcmd);
+
+            // synchronous
+            if (handle > 0) {
+                resp = k(handle, kcmd_str, (K)0);
+                RETVAL = sv_from_k(resp);
+                r0(resp);
+            }
+            // asynchronous
+            else {
+                resp = k(handle, kcmd_str, (K)0);
+                if (resp == NULL) {
+                    croak("Failed to execute command asynchronously");
+                }
+                RETVAL = &PL_sv_undef;
+            }
+        }
+        // receive
+        else {
+            resp = k(handle, (S)0);
             RETVAL = sv_from_k(resp);
             r0(resp);
         }
-        else if (handle < 0) { // asynchronous
-            resp = k(handle, kcmd, (K)0);
-            if (resp == NULL) {
-                croak("Failed to execute command asynchronously");
-            }
-            RETVAL = &PL_sv_undef;
-        }
-        else {
-            croak("Attempt to call k on an invalid handle");
-        }
-    OUTPUT:
-        RETVAL
 
-SV*
-k_listen(handle)
-    int handle
-    CODE:
-        K resp;
-
-        // read incoming asynch
-        resp = k(handle, (S)0);
-        RETVAL = sv_from_k(resp);
-        r0(resp);
     OUTPUT:
         RETVAL
