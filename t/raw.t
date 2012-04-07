@@ -52,17 +52,17 @@ sub scalar_tests {
     is k($handle, '`float$13.7'), 13.7,  'parse float';
     is k($handle, '`foo'),        'foo', 'parse symbol';
 
-    is k($handle, '2012.03.24D23:25:13.123456789'),
-       '1332631513.12346', 'parse timestamp';
+    is k($handle, '2012.03.24D23:25:13.12345678912345'),
+       385946713123456789, 'parse timestamp';
 
     is k($handle, '385946713123000000j'),
-       '385946713123000000', 'parse long';
+       385946713123000000, 'parse long';
 
     is k($handle, '`month$3'),   3,    'parse month';
     is k($handle, '2012.03.24'), 4466, 'parse date';
 
     is k($handle, '17D12:13:14.000001234'),
-       '1512794000001234', 'parse timespan';
+       1512794000001234, 'parse timespan';
 
     is k($handle, '`minute$4'),   4,        'parse minute';
     is k($handle, '`second$5'),   5,        'parse second';
@@ -182,7 +182,7 @@ sub vector_tests {
 
     is_deeply
         k($handle, 'enlist 2012.03.24D23:25:13.123456789'),
-        [ qw(1332631513.12346)],
+        [ 385946713123456789 ],
         'parse timestamp vector';
 }
 

@@ -5,9 +5,6 @@
 #include "kparse.h"
 #include <string.h>
 
-#define K_EPOCH_OFFSET   946684800000000000.0
-#define NANOS_PER_SECOND 1000000000.0
-
 SV* sv_from_k(K k) {
     SV* result;
     if (k->t < 0) {
@@ -305,7 +302,7 @@ SV* timestamp_from_k(K k) {
         return newSVpvn("-inf", 4);
     }
 
-    return newSVnv( (k->j + K_EPOCH_OFFSET) / NANOS_PER_SECOND);
+    return newSViv(k->j);
 }
 
 SV* long_from_k(K k) {
@@ -441,8 +438,6 @@ SV* int_vector_from_k(K k) {
 }
 
 SV* long_vector_from_k(K k) {
-    char buffer[33];
-
     AV *av = newAV();
     int i = 0;
 
@@ -462,8 +457,7 @@ SV* long_vector_from_k(K k) {
             continue;
         }
 
-        snprintf(buffer, 33, "%Ld", kJ(k)[i]);
-        av_push(av, newSVpv(buffer, 0) );
+        av_push(av, newSViv(kJ(k)[i]) );
     }
 
     return (SV*)av;
@@ -489,7 +483,7 @@ SV* timestamp_vector_from_k(K k) {
             continue;
         }
 
-        av_push(av, newSVnv( (kJ(k)[i] + K_EPOCH_OFFSET) / NANOS_PER_SECOND));
+        av_push(av, newSViv(kJ(k)[i]) );
     }
 
     return (SV*)av;
