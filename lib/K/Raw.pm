@@ -8,7 +8,7 @@ use XSLoader;
 use Exporter;
 
 our @ISA     = qw(Exporter);
-our @EXPORT  = qw(khpu khpun k kclose);
+our @EXPORT  = qw(khpu khpun k kclose listen);
 
 XSLoader::load('K');
 

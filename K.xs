@@ -62,3 +62,16 @@ k_k(handle, kcmd)
         }
     OUTPUT:
         RETVAL
+
+SV*
+k_listen(handle)
+    int handle
+    CODE:
+        K resp;
+
+        // read incoming asynch
+        resp = k(handle, (S)0);
+        RETVAL = sv_from_k(resp);
+        r0(resp);
+    OUTPUT:
+        RETVAL

@@ -52,8 +52,8 @@ sub scalar_tests {
     is k($handle, '`float$13.7'), 13.7,  'parse float';
     is k($handle, '`foo'),        'foo', 'parse symbol';
 
-    is k($handle, '2012.03.24D23:25:13.123'),
-       '385946713123000000', 'parse timestamp';
+    is k($handle, '2012.03.24D23:25:13.123456789'),
+       '1332631513.12346', 'parse timestamp';
 
     is k($handle, '385946713123000000j'),
        '385946713123000000', 'parse long';
@@ -179,6 +179,11 @@ sub vector_tests {
     is_deeply k($handle, '(7f;8f;9f)'), [7, 8, 9],         'parse float vector';
 
     is_deeply k($handle, '(`a;`b;`c)'), [qw(a b c)],       'parse symbol vector';
+
+    is_deeply
+        k($handle, 'enlist 2012.03.24D23:25:13.123456789'),
+        [ qw(1332631513.12346)],
+        'parse timestamp vector';
 }
 
 sub mixed_list_tests {

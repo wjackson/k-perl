@@ -5,6 +5,9 @@
 #include "kparse.h"
 #include <string.h>
 
+#define K_EPOCH_OFFSET   946684800000000000.0
+#define NANOS_PER_SECOND 1000000000.0
+
 SV* sv_from_k(K k) {
     SV* result;
     if (k->t < 0) {
@@ -48,9 +51,12 @@ SV* scalar_from_k(K k) {
             break;
 
         case KJ: // long
-        case KP: // timestamp
         case KN: // timespan
             result = long_from_k(k);
+            break;
+
+        case KP: // timestamp
+            result = timestamp_from_k(k);
             break;
 
         case KE: // real
@@ -106,9 +112,12 @@ SV* vector_from_k(K k) {
             break;
 
         case KJ: // long
-        case KP: // timestamp
         case KN: // timespan
             result = long_vector_from_k(k);
+            break;
+
+        case KP: // timestamp
+            result = timestamp_vector_from_k(k);
             break;
 
         case KE: // real
@@ -283,6 +292,22 @@ SV* int_from_k(K k) {
     return newSViv(k->i);
 }
 
+SV* timestamp_from_k(K k) {
+    if (k->j == nj) {
+        return &PL_sv_undef;
+    }
+
+    if (k->j == wj) {
+        return newSVpvn("inf", 3);
+    }
+
+    if (k->j == -wj) {
+        return newSVpvn("-inf", 4);
+    }
+
+    return newSVnv( (k->j + K_EPOCH_OFFSET) / NANOS_PER_SECOND);
+}
+
 SV* long_from_k(K k) {
     if (k->j == nj) {
         return &PL_sv_undef;
@@ -439,6 +464,32 @@ SV* long_vector_from_k(K k) {
 
         snprintf(buffer, 33, "%Ld", kJ(k)[i]);
         av_push(av, newSVpv(buffer, 0) );
+    }
+
+    return (SV*)av;
+}
+
+SV* timestamp_vector_from_k(K k) {
+    AV *av = newAV();
+    int i = 0;
+
+    for (i = 0; i < k->n; i++) {
+        if (kJ(k)[i] == nj) {
+            av_push(av, &PL_sv_undef);
+            continue;
+        }
+
+        if (kJ(k)[i] == wj) {
+            av_push(av, newSVpvn("inf", 3));
+            continue;
+        }
+
+        if (kJ(k)[i] == -wj) {
+            av_push(av, newSVpvn("-inf", 4));
+            continue;
+        }
+
+        av_push(av, newSVnv( (kJ(k)[i] + K_EPOCH_OFFSET) / NANOS_PER_SECOND));
     }
 
     return (SV*)av;
