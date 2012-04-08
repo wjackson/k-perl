@@ -143,6 +143,8 @@ SV* vector_from_k(K k) {
             result = xd_from_k(k);
             break;
 
+        // enumerations (start at 20?) other stuff?
+
         case 100: // function
             return &PL_sv_undef;
             break;

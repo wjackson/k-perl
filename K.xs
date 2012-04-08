@@ -6,6 +6,18 @@
 #include "k.h"
 #include "kparse.h"
 
+void croak_on_error(char *msg, K resp) {
+    if (resp == NULL) {
+        croak(msg);
+    }
+
+    if (resp->t == -128) {
+        croak("%s with k error '%s'", msg, resp->s );
+    }
+
+    return;
+}
+
 MODULE = K   PACKAGE = K::Raw   PREFIX = k_
 PROTOTYPES: DISABLE
 
@@ -17,7 +29,7 @@ k_khpu(host, port, credentials)
     CODE:
         int i = khpu(host, port, credentials);
         if (i <= 0) {
-            croak("Failed to connect to remote k instance");
+            croak("Failed to connect to remote k instance '%s:%d'", host, port);
         }
         RETVAL = newSViv(i);
     OUTPUT:
@@ -32,7 +44,7 @@ k_khpun(host, port, credentials, timeout)
     CODE:
         int i = khpun(host, port, credentials, timeout);
         if (i <= 0) {
-            croak("Failed to connect to remote k instance");
+            croak("Failed to connect to remote k instance '%s:%d'", host, port);
         }
         RETVAL = newSViv(i);
     OUTPUT:
@@ -63,15 +75,14 @@ k_k(handle, kcmd=&PL_sv_undef)
             // synchronous
             if (handle > 0) {
                 resp = k(handle, kcmd_str, (K)0);
+                croak_on_error("Synchronous command failed", resp);
                 RETVAL = sv_from_k(resp);
                 r0(resp);
             }
             // asynchronous
             else {
                 resp = k(handle, kcmd_str, (K)0);
-                if (resp == NULL) {
-                    croak("Failed to execute command asynchronously");
-                }
+                croak_on_error("Asynchronous command failed", resp);
                 RETVAL = &PL_sv_undef;
             }
         }
@@ -79,9 +90,8 @@ k_k(handle, kcmd=&PL_sv_undef)
         else {
             resp = k(handle, (S)0);
             RETVAL = sv_from_k(resp);
-            if (resp != NULL) {
-                r0(resp);
-            }
+            croak_on_error("Receive failed", resp);
+            r0(resp);
         }
 
     OUTPUT:

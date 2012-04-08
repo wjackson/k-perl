@@ -75,7 +75,9 @@ sub recv {
 sub DEMOLISH {
     my ($self) = @_;
 
-    kclose($self->handle);
+    if ($self->has_handle) {
+        kclose($self->handle);
+    }
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -9,7 +9,7 @@ test_qserver {
 
     use_ok 'K::Raw';
 
-    my $handle = khpu("localhost", $port, "");
+    my $handle = khpu("localhost", $port, "test");
 
     ok $handle > 0, 'connected';
 
@@ -71,7 +71,7 @@ sub scalar_tests {
     my $datetime = k($handle, '2012.03.24T12:13:14.01');
     is sprintf('%.3f', $datetime), '4466.509', 'parse datetime';
 
-    throws_ok { k($handle, 'does_not_exist') } qr/^does_not_exist at/,
+    throws_ok { k($handle, 'does_not_exist') } qr/does_not_exist/,
         'croaked properly on error';
 }
 

@@ -15,7 +15,7 @@ if (!defined $c_o || !-f $c_o) {
     die q{*** Unable to find the required file c.o which is distributed by }
       . q{kx.com.  Set the environment variable KOBJ to the location of c.o }
       . q{or download the appropriate file and place it into the q }
-      . q{directory. Find the correct file for you system here: }
+      . q{directory. Find the correct file for your system here: }
       . q{http://kx.com/q. For example the url for the 32 bit linux file is }
       . q{http://kx.com/q/l32/c.o .}
       ;
@@ -40,6 +40,7 @@ $pkg->save_config('build/IFiles.pm');
 makemaker_args(
     $pkg->get_makefile_vars,
     OBJECT => "\$(O_FILES) $c_o", # link all the C files too
+    # OPTIMIZE => '-g -DDEBUG',
 );
 
 name 'K';
