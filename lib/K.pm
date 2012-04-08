@@ -66,6 +66,12 @@ sub async_cmd {
     return k(-$self->handle, $cmd);
 }
 
+sub recv {
+    my ($self) = @_;
+
+    return k($self->handle);
+}
+
 sub DEMOLISH {
     my ($self) = @_;
 
@@ -119,9 +125,11 @@ K - Perl bindings for k (aka q, aka kdb, aka kx)
     #   },
     # ]
 
+    # execute a command asynchronously
     $k->async_cmd( q/.u.upd[`t; (`foo; 2012.03.27D13:14:15.161718; 1.23)]/ );
 
-    my $msg = $k->listen; # receive incoming messages
+    # receive incoming messages
+    my $msg = $k->recv;
 
 =head1 DESCRIPTION
 
