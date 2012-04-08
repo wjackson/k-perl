@@ -14,9 +14,8 @@ test_qserver {
 
     is_deeply $k->cmd(q/"abc"/), [qw/a b c/], 'make char vector';
 
-    is $k->cmd(q/2012.03.24D12:13:14.15161728/),
-        385906394151617280,
-        'timestamp';
+    my $timestamp = $k->cmd(q/2012.03.24D12:13:14.15161728/);
+    is "$timestamp", '385906394151617280', 'timestamp';
 };
 
 END { done_testing; }

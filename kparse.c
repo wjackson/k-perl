@@ -5,6 +5,9 @@
 #include "kparse.h"
 #include <string.h>
 
+#define MATH_INT64_NATIVE_IF_AVAILABLE
+#include "perl_math_int64.h"
+
 SV* sv_from_k(K k) {
 
     SV* result;
@@ -299,7 +302,6 @@ SV* int_from_k(K k) {
         return newSVpvn("-inf", 4);
     }
 
-    /* return SvREFCNT_inc(newSViv(k->i)); */
     return newSViv(k->i);
 }
 
@@ -316,7 +318,7 @@ SV* timestamp_from_k(K k) {
         return newSVpvn("-inf", 4);
     }
 
-    return newSViv(k->j);
+    return newSVi64(k->j);
 }
 
 SV* long_from_k(K k) {
@@ -332,9 +334,7 @@ SV* long_from_k(K k) {
         return newSVpvn("-inf", 4);
     }
 
-    char buffer[33];
-    snprintf(buffer, 33, "%Ld", k->j);
-    return newSVpv(buffer, 0);
+    return newSVi64(k->j);
 }
 
 SV* real_from_k(K k) {
@@ -471,7 +471,7 @@ SV* long_vector_from_k(K k) {
             continue;
         }
 
-        av_push(av, newSViv(kJ(k)[i]) );
+        av_push(av, newSVi64(kJ(k)[i]) );
     }
 
     return (SV*)av;
@@ -497,7 +497,7 @@ SV* timestamp_vector_from_k(K k) {
             continue;
         }
 
-        av_push(av, newSViv(kJ(k)[i]) );
+        av_push(av, newSVi64(kJ(k)[i]) );
     }
 
     return (SV*)av;

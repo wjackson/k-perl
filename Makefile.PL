@@ -53,6 +53,7 @@ ppport;
 configure_requires 'ExtUtils::Depends';
 requires 'Moose';
 requires 'namespace::autoclean';
+requires 'Math::Int64';
 test_requires 'File::Which';
 test_requires 'Test::More';
 test_requires 'Test::Exception';

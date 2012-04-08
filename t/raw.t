@@ -9,7 +9,7 @@ test_qserver {
 
     use_ok 'K::Raw';
 
-    my $handle = khpu("localhost", $port, "test");
+    my $handle = khpu("localhost", $port, "");
 
     ok $handle > 0, 'connected';
 
@@ -52,17 +52,17 @@ sub scalar_tests {
     is k($handle, '`float$13.7'), 13.7,  'parse float';
     is k($handle, '`foo'),        'foo', 'parse symbol';
 
-    is k($handle, '2012.03.24D23:25:13.12345678912345'),
-       385946713123456789, 'parse timestamp';
+    my $timestamp = k($handle, '2012.03.24D23:25:13.12345678912345');
+    is "$timestamp", '385946713123456789', 'parse timestamp';
 
-    is k($handle, '385946713123000000j'),
-       385946713123000000, 'parse long';
+    my $long = k($handle, '385946713123000000j');
+    is "$long", '385946713123000000', 'parse long';
 
     is k($handle, '`month$3'),   3,    'parse month';
     is k($handle, '2012.03.24'), 4466, 'parse date';
 
-    is k($handle, '17D12:13:14.000001234'),
-       1512794000001234, 'parse timespan';
+    my $timespan = k($handle, '17D12:13:14.000001234');
+    is "$timespan", '1512794000001234', 'parse timespan';
 
     is k($handle, '`minute$4'),   4,        'parse minute';
     is k($handle, '`second$5'),   5,        'parse second';
@@ -165,39 +165,40 @@ sub vector_tests {
     my ($handle) = @_;
 
     is_deeply k($handle, '(0b;1b;0b)'), [undef, 1, undef], 'parse bool vector';
-
     is_deeply k($handle, '"abc"'),      [qw(a b c)],       'parse char vector';
-
     is_deeply k($handle, '(7h;8h;9h)'), [7, 8, 9],         'parse short vector';
-
     is_deeply k($handle, '(7i;8i;9i)'), [7, 8, 9],         'parse int vector';
 
-    is_deeply k($handle, '(7j;8j;9j)'), [qw(7 8 9)],       'parse long vector';
+    is_deeply
+        [ map {"$_"} @{ k($handle, '(7j;8j;9j)') } ],
+        [ qw(7 8 9) ],
+        'parse long vector';
 
-    is_deeply k($handle, '(7e;8e;9e)'), [7, 8, 9],         'parse real vector';
-
-    is_deeply k($handle, '(7f;8f;9f)'), [7, 8, 9],         'parse float vector';
-
-    is_deeply k($handle, '(`a;`b;`c)'), [qw(a b c)],       'parse symbol vector';
+    is_deeply k($handle, '(7e;8e;9e)'), [7, 8, 9],   'parse real vector';
+    is_deeply k($handle, '(7f;8f;9f)'), [7, 8, 9],   'parse float vector';
+    is_deeply k($handle, '(`a;`b;`c)'), [qw(a b c)], 'parse symbol vector';
 
     is_deeply
-        k($handle, 'enlist 2012.03.24D23:25:13.123456789'),
-        [ 385946713123456789 ],
+        [ map { "$_" } @{ k($handle, 'enlist 2012.03.24D23:25:13.123456789') } ],
+        [ '385946713123456789' ],
         'parse timestamp vector';
 }
 
 sub mixed_list_tests {
     my ($handle) = @_;
 
-    is_deeply k($handle, '(1b;8i;9j)'), [1, 8, 9], 'parse mixed list of nums';
+    is_deeply
+        [ map { "$_" } @{ k($handle, '(1b;8i;9j)') } ],
+        [ qw/1 8 9/],
+        'parse mixed list of nums';
 
     is_deeply
-        k($handle, '((1e;2i;(3f;4j));"x")'),
+        k($handle, '((1e;2i;(3f;`foo));"x")'),
         [
             [
                 1,
                 2,
-                [3,4],
+                [3,'foo'],
             ],
             'x',
         ],

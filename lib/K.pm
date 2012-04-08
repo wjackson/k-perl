@@ -130,7 +130,7 @@ K - Perl bindings for k (aka q, aka kdb, aka kx)
     # execute a command asynchronously
     $k->async_cmd( q/.u.upd[`t; (`foo; 2012.03.27D13:14:15.161718; 1.23)]/ );
 
-    # receive incoming messages
+    # receive incoming message
     my $msg = $k->recv;
 
 =head1 DESCRIPTION
@@ -148,6 +148,15 @@ C<K> returns simple Perl representations of k values.  For example, inside k
 timestamps are 64-bit ints where the value is the number of nanoseconds since
 2001.01.01D00:00:00.000 .  For such values, C<K> returns the int value (ex:
 385906394151617280).
+
+=head1 32-bit Perl
+
+Several K datatypes are repesented as longs (64-bit ints).  These include
+timestamps, timespans, and actual longs.  Such values become native Perl ints
+if your Perl supports 64-bit ints.  If your Perl doesn't support native 64-bit
+ints then K longs are represented as Math::Int64 objects.  This should be
+transparent but there may be performance or other implications.  The author of
+this module tests almost exclusively with a 64-bit Perl.
 
 =head1 SEE ALSO
 

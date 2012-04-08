@@ -6,6 +6,9 @@
 #include "k.h"
 #include "kparse.h"
 
+#define MATH_INT64_NATIVE_IF_AVAILABLE
+#include "perl_math_int64.h"
+
 void croak_on_error(char *msg, K resp) {
     if (resp == NULL) {
         croak(msg);
@@ -20,6 +23,8 @@ void croak_on_error(char *msg, K resp) {
 
 MODULE = K   PACKAGE = K::Raw   PREFIX = k_
 PROTOTYPES: DISABLE
+BOOT:
+    MATH_INT64_BOOT;
 
 SV*
 k_khpu(host, port, credentials)
