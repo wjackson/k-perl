@@ -205,7 +205,14 @@ SV* dict_from_k(K k) {
 
     int key_count = av_len(keys) + 1;
 
-    for (i = 0; i < key_count; i++) {
+    /*  k dicts can have the same key multiple times.  When such dicts are
+     *  referenced using a key, the value for the first occurance of the key
+     *  is the one returned.  Perl has the opposite.  Here we go through the
+     *  keys backward to ensure the value for any duplicate keys ends up being
+     *  the value associated with the first occurance of the key as it would
+     *  in k/q.
+     */
+    for (i = key_count -1; i >= 0; i--) {
         key = av_fetch(keys, i, 0);
         val = av_fetch(vals, i, 0);
 

@@ -229,6 +229,11 @@ sub dict_test {
             bar => [ 3, 4 ],
         },
         'parse dictionary w/ list values';
+
+    is_deeply
+        k($handle, '`foo`foo!(1;2)'),
+        { foo => 1 },
+        'parse dictionary w/ list values';
 }
 
 sub table_test {
