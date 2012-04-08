@@ -16,6 +16,9 @@ k_khpu(host, port, credentials)
     char *credentials
     CODE:
         int i = khpu(host, port, credentials);
+        if (i <= 0) {
+            croak("Failed to connect to remote k instance");
+        }
         RETVAL = newSViv(i);
     OUTPUT:
         RETVAL
@@ -28,6 +31,9 @@ k_khpun(host, port, credentials, timeout)
     int timeout
     CODE:
         int i = khpun(host, port, credentials, timeout);
+        if (i <= 0) {
+            croak("Failed to connect to remote k instance");
+        }
         RETVAL = newSViv(i);
     OUTPUT:
         RETVAL
@@ -73,7 +79,9 @@ k_k(handle, kcmd=&PL_sv_undef)
         else {
             resp = k(handle, (S)0);
             RETVAL = sv_from_k(resp);
-            r0(resp);
+            if (resp != NULL) {
+                r0(resp);
+            }
         }
 
     OUTPUT:

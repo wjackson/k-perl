@@ -121,6 +121,8 @@ K - Perl bindings for k (aka q, aka kdb, aka kx)
 
     $k->async_cmd( q/.u.upd[`t; (`foo; 2012.03.27D13:14:15.161718; 1.23)]/ );
 
+    my $msg = $k->listen; # receive incoming messages
+
 =head1 DESCRIPTION
 
 Connect to a remote K or Q instance.  Execute commands.  Read replies.
@@ -132,10 +134,10 @@ L<http://code.kx.com/wiki/Cookbook/InterfacingWithC> .
 C<K>'s OO interface is a thin layer of sugar on top of L<K::Raw> which mimics
 the C library as faithfully as possible.
 
-For now, C<K> returns very simple Perl representations of k values.  For
-example, inside k timestamps are 64-bit ints where the value is the number of
-nanoseconds since 2001.01.01D00:00:00.000 .  For such values, C<K> returns the
-int value as a string (ex: '385906394151617280').  This will probably change.
+C<K> returns simple Perl representations of k values.  For example, inside k
+timestamps are 64-bit ints where the value is the number of nanoseconds since
+2001.01.01D00:00:00.000 .  For such values, C<K> returns the int value (ex:
+385906394151617280).
 
 =head1 SEE ALSO
 

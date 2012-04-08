@@ -6,8 +6,13 @@
 #include <string.h>
 
 SV* sv_from_k(K k) {
+
     SV* result;
-    if (k->t < 0) {
+
+    if (k == NULL) {
+        result = &PL_sv_undef;
+    }
+    else if (k->t < 0) {
         result = scalar_from_k(k);
     }
     else if (k->t > 0) {
