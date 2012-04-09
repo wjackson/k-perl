@@ -1,6 +1,6 @@
 package K::Raw;
 BEGIN {
-    $K::Raw::VERSION = '0.05';
+    $K::Raw::VERSION = '0.06';
 }
 use strict;
 use warnings;

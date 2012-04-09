@@ -1,3 +1,8 @@
+0.06 Thu. Apr 08, 2012
+    - Provide mechansim for receiving messages
+    - Improve error detection and reporting
+    - Support Perls with and without native 64-bit ints
+
 0.05 Thu. Apr 05, 2012
     - Make sure version and abstract are set properly
 
