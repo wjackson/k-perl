@@ -30,6 +30,12 @@ has password => (
     predicate => 'has_password',
 );
 
+has timeout => (
+    is        => 'ro',
+    isa       => 'Int',
+    predicate => 'has_timeout',
+);
+
 has handle => (
     is         => 'ro',
     isa        => 'Int',
@@ -39,7 +45,11 @@ has handle => (
 sub _build_handle {
     my ($self) = @_;
 
-    my $handle = khpu($self->host, $self->port, $self->_credentials);
+    my $handle
+        = $self->has_timeout
+        ? khpun($self->host, $self->port, $self->_credentials, $self->timeout)
+        : khpu ($self->host, $self->port, $self->_credentials)
+        ;
 
     confess 'Failed to connect to Q server' if $handle <= 0;
 
@@ -98,6 +108,7 @@ K - Perl bindings for k (aka q, aka kdb, aka kx)
         port     => 5000,
         user     => 'awhitney',
         password => 'kdb4eva',
+        timeout  => 1000,
     );
 
     $k->cmd( '4 + 4' ); # 8
@@ -148,6 +159,44 @@ C<K> returns simple Perl representations of k values.  For example, inside k
 timestamps are 64-bit ints where the value is the number of nanoseconds since
 2001.01.01D00:00:00.000 .  For such values, C<K> returns the int value (ex:
 385906394151617280).
+
+=head1 METHODS
+
+=head2 new
+
+The constructor takes the following optional arguments:
+
+=over 4
+
+=item host (default: 'localhost')
+
+=item port (default: '5000')
+
+=item user (default: undef)
+
+=item password (default: undef)
+
+=item timeout (default: undef)
+
+If a timeout is given then C<K> will throw an exception if it's unable to
+connect in the provided number of milliseconds.
+
+=back
+
+=head2 cmd
+
+Takes a string containing a q command and executes it synchronously on the
+remote q instance.  Returns the perlified result of the command.
+
+=head2 async_cmd
+
+Takes a string containing a q command and executes it asynchronously on the
+remote q instance.
+
+=head2 recv
+
+Listens for a message from the remote q instance.  When a message arrives it's
+returned.
 
 =head1 32-bit Perl
 

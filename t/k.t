@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 use t::QServer;
 
 test_qserver {
@@ -17,5 +18,16 @@ test_qserver {
     my $timestamp = $k->cmd(q/2012.03.24D12:13:14.15161728/);
     is "$timestamp", '385906394151617280', 'timestamp';
 };
+
+test_qserver {
+
+    my $port = shift;
+
+    throws_ok { K->new( port => $port, timeout => 10 )->cmd('2+2') }
+              qr/Failed to connect/, 'exception on timeout';
+
+    pass 'timed out';
+
+} { hang => 1 };
 
 END { done_testing; }

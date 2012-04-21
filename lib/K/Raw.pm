@@ -28,6 +28,8 @@ K::Raw - Low-level Perl bindings for k (aka q, aka kdb, aka kx)
 
     my $handle = khpu("localhost", $port, "");
 
+    my $handle = khpun("localhost", $port, "", $timeout_in_millis);
+
     k($handle, '4 + 4'); # 8
 
     k($handle, q/"abc"/); # [ 'a', 'b', 'c' ]
