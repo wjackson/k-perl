@@ -13,23 +13,15 @@ test_qserver {
 
     ok $handle > 0, 'connected';
 
-    scalar_tests($handle);
-
-    null_scalar_tests($handle);
-
-    infinity_scalar_tests($handle);
-
-    null_vector_tests($handle);
-
-    infinite_vector_tests($handle);
-
-    vector_tests($handle);
-
-    mixed_list_tests($handle);
-
-    dict_test($handle);
-
-    table_test($handle);
+    subtest scalar          => sub { scalar_tests($handle)          };
+    subtest null_scalar     => sub { null_scalar_tests($handle)     };
+    subtest infinity_scalar => sub { infinity_scalar_tests($handle) };
+    subtest null_vector     => sub { null_vector_tests($handle)     };
+    subtest ininite_vector  => sub { infinite_vector_tests($handle) };
+    subtest vector          => sub { vector_tests($handle)          };
+    subtest mixed_list      => sub { mixed_list_tests($handle)      };
+    subtest dict            => sub { dict_test($handle)             };
+    subtest table           => sub { table_test($handle)            };
 
     kclose($handle);
 };
@@ -40,10 +32,11 @@ sub scalar_tests {
     ok  k($handle, '2 = 2'), 'parse true';
     ok !k($handle, '2 = 3'), 'parse false';
 
-    is k($handle, '`int$7'),    7,   'parse int';
-    is k($handle, '"c"'),       'c', 'parse char';
-    is k($handle, '`short$12'), 12,  'parse short';
-    is k($handle, '`long$13'),  13,  'parse long';
+    is k($handle, '`int$7'),    7,    'parse int';
+    is k($handle, '0x1f'),      0x1f, 'parse byte';
+    is k($handle, '"c"'),       'c',  'parse char';
+    is k($handle, '`short$12'), 12,   'parse short';
+    is k($handle, '`long$13'),  13,   'parse long';
 
     my $real = k($handle, '`real$13.7');
     ok $real > 13.699999, 'real lower bound';
@@ -79,8 +72,8 @@ sub null_scalar_tests {
     my ($handle) = @_;
 
     is k( $handle, '0b' ),   undef, 'null boolean';
-    is k( $handle, '0x00' ), undef, 'null byte';
-    is k( $handle, '0Nh' ),  undef, 'null short';
+    is k( $handle, '0x00' ), 0x00,  'null byte';  # 0
+    is k( $handle, '0Nh' ),  undef, 'null short'; # 0
     is k( $handle, '0N' ),   undef, 'null int';
     is k( $handle, '0Nj' ),  undef, 'null long';
     is k( $handle, '0Ne' ),  undef, 'null real';
@@ -122,13 +115,13 @@ sub null_vector_tests {
     my ($handle) = @_;
 
     is_deeply k( $handle, '(),0b'  ), [ undef ], 'null boolean vector';
-    is_deeply k( $handle, '(),0x00'), [ undef ], 'null byte vector';
+    is_deeply k( $handle, '(),0x00'), [ 0x00  ], 'null byte vector';
+    is_deeply k( $handle, '()," "' ), ' ',       'null char vector'; # this ones weird
     is_deeply k( $handle, '(),0Nh' ), [ undef ], 'null short vector';
     is_deeply k( $handle, '(),0N'  ), [ undef ], 'null int vector';
     is_deeply k( $handle, '(),0Nj' ), [ undef ], 'null long vector';
     is_deeply k( $handle, '(),0Ne' ), [ undef ], 'null real vector';
     is_deeply k( $handle, '(),0n'  ), [ undef ], 'null float vector';
-    is_deeply k( $handle, '()," "' ), [ ' '   ], 'null char vector'; # this ones weird
     is_deeply k( $handle, '(),`'   ), [ undef ], 'null sym vector';
     is_deeply k( $handle, '(),0Nm' ), [ undef ], 'null month vector';
     is_deeply k( $handle, '(),0Nd' ), [ undef ], 'null day vector';
@@ -165,7 +158,7 @@ sub vector_tests {
     my ($handle) = @_;
 
     is_deeply k($handle, '(0b;1b;0b)'), [undef, 1, undef], 'parse bool vector';
-    is_deeply k($handle, '"abc"'),      [qw(a b c)],       'parse char vector';
+    is_deeply k($handle, '"abc"'),     "abc",              'parse char vector';
     is_deeply k($handle, '(7h;8h;9h)'), [7, 8, 9],         'parse short vector';
     is_deeply k($handle, '(7i;8i;9i)'), [7, 8, 9],         'parse int vector';
 

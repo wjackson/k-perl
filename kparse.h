@@ -12,6 +12,7 @@ SV* table_from_k(K);
 SV* mixed_list_from_k(K);
 
 SV* bool_from_k(K);
+SV* byte_from_k(K);
 SV* char_from_k(K);
 SV* short_from_k(K);
 SV* int_from_k(K);

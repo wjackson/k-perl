@@ -38,6 +38,9 @@ SV* scalar_from_k(K k) {
             break;
 
         case KG: // byte
+            result = byte_from_k(k);
+            break;
+
         case KC: // char
             result = char_from_k(k);
             break;
@@ -99,8 +102,11 @@ SV* vector_from_k(K k) {
             break;
 
         case KG: // byte
-        case KC: // char
             result = byte_vector_from_k(k);
+            break;
+
+        case KC: // char
+            result = char_vector_from_k(k);
             break;
 
         case KH: // short
@@ -165,7 +171,7 @@ SV* vector_from_k(K k) {
             break;
     }
 
-    return newRV_noinc((SV*)result);
+    return result;
 }
 
 /*
@@ -264,7 +270,7 @@ SV* dict_from_k(K k) {
     SvREFCNT_dec(keys_ref);
     SvREFCNT_dec(vals_ref);
 
-    return (SV*)hv;
+    return newRV_noinc( (SV*)hv );
 }
 
 SV* table_from_k(K k) {
@@ -295,11 +301,11 @@ SV* bool_from_k(K k) {
     return newSViv( k->g );
 }
 
-SV* char_from_k(K k) {
-    if (k->g == 0) {
-        return &PL_sv_undef;
-    }
+SV* byte_from_k(K k) {
+    return newSVuv( k->g );
+}
 
+SV* char_from_k(K k) {
     char byte_str[1];
     byte_str[0] = k->g;
     return newSVpvn(byte_str, 1);
@@ -410,25 +416,29 @@ SV* bool_vector_from_k(K k) {
         av_push(av, newSViv( kG(k)[i]) );
     }
 
-    return (SV*)av;
+    return newRV_noinc( (SV*)av );
 }
 
 SV* byte_vector_from_k(K k) {
     AV *av = newAV();
-    char byte_str[1];
     int i = 0;
 
     for (i = 0; i < k->n; i++) {
-        if (kG(k)[i] == 0) {
-            av_push(av, &PL_sv_undef);
-            continue;
-        }
-
-        byte_str[0] = kG(k)[i];
-        av_push(av, newSVpvn(byte_str, 1));
+        av_push(av, newSVuv( kG(k)[i] ));
     }
 
-    return (SV*)av;
+    return newRV_noinc( (SV*)av );
+}
+
+SV* char_vector_from_k(K k) {
+    char byte_str[k->n];
+    int i = 0;
+
+    for (i = 0; i < k->n; i++) {
+        byte_str[i] = kG(k)[i];
+    }
+
+    return newSVpvn(byte_str, k->n);
 }
 
 SV* short_vector_from_k(K k) {
@@ -454,7 +464,7 @@ SV* short_vector_from_k(K k) {
         av_push(av, newSViv( kH(k)[i]) );
     }
 
-    return (SV*)av;
+    return newRV_noinc( (SV*)av );
 }
 
 SV* int_vector_from_k(K k) {
@@ -480,7 +490,7 @@ SV* int_vector_from_k(K k) {
         av_push(av, newSViv( kI(k)[i]) );
     }
 
-    return (SV*)av;
+    return newRV_noinc( (SV*)av );
 }
 
 SV* long_vector_from_k(K k) {
@@ -506,7 +516,7 @@ SV* long_vector_from_k(K k) {
         av_push(av, newSVi64(kJ(k)[i]) );
     }
 
-    return (SV*)av;
+    return newRV_noinc( (SV*)av );
 }
 
 SV* timestamp_vector_from_k(K k) {
@@ -532,7 +542,7 @@ SV* timestamp_vector_from_k(K k) {
         av_push(av, newSVi64(kJ(k)[i]) );
     }
 
-    return (SV*)av;
+    return newRV_noinc( (SV*)av );
 }
 
 SV* real_vector_from_k(K k) {
@@ -548,7 +558,7 @@ SV* real_vector_from_k(K k) {
         av_push(av, newSVnv( kE(k)[i] ) );
     }
 
-    return (SV*)av;
+    return newRV_noinc( (SV*)av );
 }
 
 SV* float_vector_from_k(K k) {
@@ -564,7 +574,7 @@ SV* float_vector_from_k(K k) {
         av_push(av, newSVnv( kF(k)[i] ) );
     }
 
-    return (SV*)av;
+    return newRV_noinc( (SV*)av );
 }
 
 SV* symbol_vector_from_k(K k) {
@@ -583,5 +593,5 @@ SV* symbol_vector_from_k(K k) {
         av_push(av, newSVpv( kS(k)[i], 0 ) );
     }
 
-    return (SV*)av;
+    return newRV_noinc( (SV*)av );
 }
