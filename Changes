@@ -1,3 +1,7 @@
+0.07 Thu. Apr 22, 2012
+    - Support connection timeouts
+    - Represent paritioned tables and unparttioned tables the same way
+
 0.06 Thu. Apr 08, 2012
     - Provide mechansim for receiving messages
     - Improve error detection and reporting
