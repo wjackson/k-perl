@@ -13,7 +13,7 @@ test_qserver {
 
     is $k->cmd('4 + 4'), 8, 'make an int';
 
-    is $k->cmd(q/"abc"/), "abc", 'make string';
+    is_deeply $k->cmd(q/"abc"/), [qw/a b c/], 'make string';
 
     my $timestamp = $k->cmd(q/2012.03.24D12:13:14.15161728/);
     is "$timestamp", '385906394151617280', 'timestamp';

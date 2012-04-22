@@ -431,14 +431,21 @@ SV* byte_vector_from_k(K k) {
 }
 
 SV* char_vector_from_k(K k) {
-    char byte_str[k->n];
+    AV *av = newAV();
+    char byte_str[1];
     int i = 0;
 
     for (i = 0; i < k->n; i++) {
-        byte_str[i] = kG(k)[i];
+        if (kG(k)[i] == 0) {
+            av_push(av, &PL_sv_undef);
+            continue;
+        }
+
+        byte_str[0] = kG(k)[i];
+        av_push(av, newSVpvn(byte_str, 1));
     }
 
-    return newSVpvn(byte_str, k->n);
+    return newRV_noinc( (SV*)av );
 }
 
 SV* short_vector_from_k(K k) {

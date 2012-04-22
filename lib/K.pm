@@ -113,7 +113,7 @@ K - Perl bindings for k (aka q, aka kdb, aka kx)
 
     $k->cmd( '4 + 4' ); # 8
 
-    $k->cmd( q/"abc"/ ); # "abc"
+    $k->cmd( q/"abc"/ ); # ['a', 'b', 'c']
 
     $k->cmd( q/`foo`bar!(1;2)/ ); # { foo => 1, bar => 2 }
 

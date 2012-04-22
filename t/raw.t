@@ -116,7 +116,7 @@ sub null_vector_tests {
 
     is_deeply k( $handle, '(),0b'  ), [ undef ], 'null boolean vector';
     is_deeply k( $handle, '(),0x00'), [ 0x00  ], 'null byte vector';
-    is_deeply k( $handle, '()," "' ), ' ',       'null char vector'; # this ones weird
+    is_deeply k( $handle, '()," "' ), [ ' '   ], 'null char vector'; # this ones weird
     is_deeply k( $handle, '(),0Nh' ), [ undef ], 'null short vector';
     is_deeply k( $handle, '(),0N'  ), [ undef ], 'null int vector';
     is_deeply k( $handle, '(),0Nj' ), [ undef ], 'null long vector';
@@ -158,7 +158,7 @@ sub vector_tests {
     my ($handle) = @_;
 
     is_deeply k($handle, '(0b;1b;0b)'), [undef, 1, undef], 'parse bool vector';
-    is_deeply k($handle, '"abc"'),     "abc",              'parse char vector';
+    is_deeply k($handle, '"abc"'),      [qw/a b c/],       'parse char vector';
     is_deeply k($handle, '(7h;8h;9h)'), [7, 8, 9],         'parse short vector';
     is_deeply k($handle, '(7i;8i;9i)'), [7, 8, 9],         'parse int vector';
 

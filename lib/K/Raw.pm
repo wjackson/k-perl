@@ -32,7 +32,7 @@ K::Raw - Low-level Perl bindings for k (aka q, aka kdb, aka kx)
 
     k($handle, '4 + 4'); # 8
 
-    k($handle, q/"abc"/); # "abc"
+    k($handle, q/"abc"/); # ['a', 'b', 'c']
 
     k($handle, q/`foo`bar!(1;2)/); # { foo => 1, bar => 2 }
 
