@@ -259,16 +259,12 @@ sub table_test {
     # table w/ primary key
     is_deeply
         k($handle, '([p: (`a;`b); q: (`c;`d) ] foo: (`aaa;`bbb); bar: (`ccc;`ddd))'),
-        [
-            {
-                p => [qw(a b)],
-                q => [qw(c d)],
-            },
-            {
-                foo => [qw(aaa bbb)],
-                bar => [qw(ccc ddd)],
-            }
-        ],
+        {
+            p   => [qw(a b)],
+            q   => [qw(c d)],
+            foo => [qw(aaa bbb)],
+            bar => [qw(ccc ddd)],
+        },
         'parse table w/ primary key';
 }
 

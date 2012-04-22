@@ -184,15 +184,47 @@ SV* xd_from_k(K k) {
     }
 }
 
+/* copy the contents of hv into store_hv */
+void hv_store_hv(HV *store_hv, HV *hv) {
+    int i;
+    int h_size = hv_iterinit(hv);
+    HE *store_ret, *he;
+    SV *key, *val;
+
+    for (i = 0; i < h_size; i++) {
+
+        he  = hv_iternext(hv);
+        key = hv_iterkeysv(he);
+        val = hv_iterval(hv, he);
+
+        store_ret = hv_store_ent(store_hv, key, val, 0);
+        if (store_ret == NULL) {
+            croak("Failed to store hash entry");
+        }
+
+        SvREFCNT_inc(val);
+    }
+}
+
 SV* ptable_from_k(K k) {
-    AV* av = newAV();
+    HV *hv = newHV();
+
     K t0   = kK(k)[0]; // partitioned tables have 2 sub-tables
     K t1   = kK(k)[1];
 
-    av_push(av, newRV_noinc( table_from_k(t0) ) );
-    av_push(av, newRV_noinc( table_from_k(t1) ) );
+    SV *t0_rv = table_from_k(t0);
+    SV *t1_rv = table_from_k(t1);
 
-    return (SV*) av;
+    HV *t0_hv = (HV*) SvRV( t0_rv );
+    HV *t1_hv = (HV*) SvRV( t1_rv );
+
+    hv_store_hv(hv, t0_hv);
+    hv_store_hv(hv, t1_hv);
+
+    SvREFCNT_dec(t0_rv);
+    SvREFCNT_dec(t1_rv);
+
+    return newRV_noinc( (SV*)hv );
 }
 
 SV* dict_from_k(K k) {

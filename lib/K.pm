@@ -117,7 +117,7 @@ K - Perl bindings for k (aka q, aka kdb, aka kx)
 
     $k->cmd( q/`foo`bar!(1;2)/ ); # { foo => 1, bar => 2 }
 
-    $k->cmd( q/2012.03.24D12:13:14.15161728/ ); # '385906394151617280'
+    $k->cmd( q/2012.03.24D12:13:14.15161728/ ); # 385906394151617280
 
     # table
     $k->cmd( q/([] foo: (`a;`b); bar: (`c;`d))/ );
@@ -128,15 +128,11 @@ K - Perl bindings for k (aka q, aka kdb, aka kx)
 
     # table w/ primary key
     $k->cmd( q/([p: (`a;`b)] foo: (`b;`c); bar: (`d;`e))/ );
-    # [
-    #   {
-    #     p   => ['a', 'b']
-    #   }
-    #   {
-    #     foo => ['b', 'c'],
-    #     bar => ['d', 'e'],
-    #   },
-    # ]
+    # {
+    #   p   => ['a', 'b'],
+    #   foo => ['b', 'c'],
+    #   bar => ['d', 'e'],
+    # },
 
     # execute a command asynchronously
     $k->async_cmd( q/.u.upd[`t; (`foo; 2012.03.27D13:14:15.161718; 1.23)]/ );
