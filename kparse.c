@@ -259,12 +259,17 @@ SV* dict_from_k(K k) {
         key = av_fetch(keys, i, 0);
         val = av_fetch(vals, i, 0);
 
-        store_ret = hv_store_ent(hv, *key, *val, 0);
+        if (val == NULL) {
+            store_ret = hv_store_ent(hv, *key, &PL_sv_undef, 0);
+        }
+        else {
+            store_ret = hv_store_ent(hv, *key, *val, 0);
+            SvREFCNT_inc(*val);
+        }
+
         if (store_ret == NULL) {
             croak("Failed to convert k hash entry to perl hash entry");
         }
-
-        SvREFCNT_inc(*val);
     }
 
     SvREFCNT_dec(keys_ref);
