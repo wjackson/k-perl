@@ -1,3 +1,6 @@
+0.09 Wed. Apr 25, 2012
+    - Throw an exception if no arg is passed to K->cmd or K->async_cmd
+
 0.08 Wed. Apr 25, 2012
     - Fix bug where null values in q dictionaries causes a segfault
 

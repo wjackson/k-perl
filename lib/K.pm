@@ -1,6 +1,6 @@
 package K;
 BEGIN {
-    $K::VERSION = '0.08';
+    $K::VERSION = '0.09';
 }
 use Moose;
 use namespace::autoclean;
@@ -67,11 +67,15 @@ sub _credentials {
 sub cmd {
     my ($self, $cmd) = @_;
 
+    confess q/No command provided/ if !defined $cmd;
+
     return k($self->handle, $cmd);
 }
 
 sub async_cmd {
     my ($self, $cmd) = @_;
+
+    confess q/No command provided/ if !defined $cmd;
 
     return k(-$self->handle, $cmd);
 }

@@ -17,6 +17,12 @@ test_qserver {
 
     my $timestamp = $k->cmd(q/2012.03.24D12:13:14.15161728/);
     is "$timestamp", '385906394151617280', 'timestamp';
+
+    throws_ok { $k->cmd } qr/No command provided/,
+        'cmd method needs an arg';
+
+    throws_ok { $k->async_cmd } qr/No command provided/,
+        'async_cmd method needs an arg';
 };
 
 test_qserver {
