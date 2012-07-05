@@ -59,9 +59,7 @@ sub _build_handle {
 sub _credentials {
     my ($self) = @_;
 
-    return '' if !$self->has_user || !$self->has_password;
-
-    return join ':', $self->user, $self->password;
+    return join ':', map { $_ // '' } $self->user, $self->password;
 }
 
 sub cmd {
@@ -115,12 +113,9 @@ K - Perl bindings for k (aka q, aka kdb, aka kx)
         timeout  => 1000,
     );
 
-    $k->cmd( '4 + 4' ); # 8
-
-    $k->cmd( q/"abc"/ ); # ['a', 'b', 'c']
-
-    $k->cmd( q/`foo`bar!(1;2)/ ); # { foo => 1, bar => 2 }
-
+    $k->cmd( '4 + 4' );                         # 8
+    $k->cmd( q/"abc"/ );                        # ['a', 'b', 'c']
+    $k->cmd( q/`foo`bar!(1;2)/ );               # { foo => 1, bar => 2 }
     $k->cmd( q/2012.03.24D12:13:14.15161728/ ); # 385906394151617280
 
     # table
