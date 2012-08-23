@@ -182,11 +182,8 @@ SV* xd_from_k(K k) {
     if (kK(k)[0]->t == XT && kK(k)[1]->t == XT) {
         return ptable_from_k(k);
     }
-    else if (kK(k)[0]->t == KS) {
-        return dict_from_k(k);
-    }
     else {
-        croak("Unrecognized XD (dictionary) form");
+        return dict_from_k(k);
     }
 }
 

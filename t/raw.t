@@ -233,6 +233,11 @@ sub dict_test {
         k($handle, '`foo`bar!(0n;`)'),
         { foo => undef, bar => undef },
         'parse dictionary w/ null values';
+
+    is_deeply
+        k($handle, '()!()'),
+        {},
+        'parse empty dictionary';
 }
 
 sub table_test {
