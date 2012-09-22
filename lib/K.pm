@@ -152,7 +152,7 @@ the C library as faithfully as possible.
 
 C<K> returns simple Perl representations of k values.  For example, inside k
 timestamps are 64-bit ints where the value is the number of nanoseconds since
-2001.01.01D00:00:00.000 .  For such values, C<K> returns the int value (ex:
+2000.01.01D00:00:00.000 .  For such values, C<K> returns the int value (ex:
 385906394151617280).
 
 =head1 METHODS
