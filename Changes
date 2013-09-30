@@ -1,3 +1,8 @@
+0.10 Mon. Sep 30, 2013
+    - Stop including k.h to minimize the chances of a k.h / c.o conflict.
+    - Set KXVER variable during build.
+    - Fix bug where test suite hangs with newer qs.
+
 0.09 Wed. Apr 25, 2012
     - Throw an exception if no arg is passed to K->cmd or K->async_cmd
 
