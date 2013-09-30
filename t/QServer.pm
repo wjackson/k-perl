@@ -23,6 +23,7 @@ sub test_qserver(&;$) {
         server => sub {
             my $port = shift;
 
+            open STDIN,  '<', '/dev/null' or die q/Can't redirect STDIN/;
             open STDOUT, '>', '/dev/null' or die q/Can't redirect STDOUT/;
             open STDERR, '>', '/dev/null' or die q/Can't redirect STDERR/;
 
